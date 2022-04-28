@@ -6,7 +6,7 @@ from Lookup.models import Area, Amount
 
 
 class Customer(models.Model):
-    cnic = models.CharField(unique=True, max_length=13)
+    customer_id = models.CharField(unique=True, max_length=4)
     phone = models.CharField(max_length=13)
     name = models.CharField(max_length=255)
     address = models.TextField()
@@ -16,7 +16,7 @@ class Customer(models.Model):
         Amount, on_delete=models.PROTECT, related_name='customer_fee')
 
     def __str__(self) -> str:
-        return str(self.name) + "-" + str(self.area)
+        return str(self.customer_id)+"--"+str(self.name) + "--"+str(self.area.name)
 
 
 class Fee(models.Model):
@@ -25,8 +25,8 @@ class Fee(models.Model):
     recipient = models.ForeignKey(
         User, on_delete=models.SET_NULL, related_name='recipient_vouchers', null=True)
     amount_paid = models.PositiveSmallIntegerField()
-    pay_date = models.DateTimeField(auto_now_add=True)
+    pay_date = models.DateField()
+    credit = models.IntegerField(default=0)
 
-    # Month
-    # Paid date
-    # Cashier name
+    def __str__(self) -> str:
+        return str(self.customer.name)
