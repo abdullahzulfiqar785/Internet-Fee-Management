@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
 from Lookup.models import Area, Amount
-
 # Create your models here.
 
 
@@ -30,3 +29,6 @@ class Fee(models.Model):
 
     def __str__(self) -> str:
         return str(self.customer.name)
+
+    class Meta:
+        ordering = ['-pay_date']

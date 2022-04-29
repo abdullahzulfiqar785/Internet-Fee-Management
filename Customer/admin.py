@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import Customer, Fee
-from .utils import get_id
+from .utils import get_id, get_date
 import datetime
 
 
@@ -11,11 +11,13 @@ class FeeAdminInline(admin.ModelAdmin):
     list_display = ['customer', 'pay_date',
                     'recipient', 'amount_paid', 'credit']
     autocomplete_fields = ['customer', 'recipient']
-    readonly_fields = ['recipient', 'credit', ]
+    readonly_fields = ['recipient', 'credit', 'pay_date', ]
+    date_hierarchy = 'pay_date'
 
     def save_model(self, request, obj, form, change) -> None:
         paying = obj.amount_paid
         cus_fee = obj.customer.fee.amount
+        obj.pay_date = get_date(obj)
         current_month = obj.pay_date.month
         current_year = obj.pay_date.year
 
@@ -33,9 +35,10 @@ class FeeAdminInline(admin.ModelAdmin):
                 obj.amount_paid = 0
                 left_credit = 0 if paying == credit_wala_object.credit else credit_wala_object.credit - paying
                 credit_wala_object.credit = 0
+                left_fee = cus_fee - credit_wala_object.amount_paid
                 credit_wala_object.amount_paid = cus_fee
                 credit_wala_object.save()
-                obj.credit = cus_fee + left_credit
+                obj.credit = cus_fee + left_credit + left_fee
                 paying = 0
                 obj.recipient = request.user
                 return super().save_model(request, obj, form, change)
