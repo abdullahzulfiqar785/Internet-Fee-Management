@@ -37,6 +37,8 @@ class FeeAdminInline(admin.ModelAdmin):
                 credit_wala_object.save()
                 obj.credit = cus_fee + left_credit
                 paying = 0
+                obj.recipient = request.user
+                return super().save_model(request, obj, form, change)
 
         if paying > cus_fee:
             obj.amount_paid = cus_fee
@@ -58,7 +60,7 @@ class FeeAdminInline(admin.ModelAdmin):
             if not customerFee.amount_paid == cus_fee:
                 customerFee.credit = cus_fee - customerFee.amount_paid
                 customerFee.save()
-        elif paying != 0 and paying < cus_fee:
+        elif paying < cus_fee:
             obj.amount_paid = paying
             obj.credit = obj.credit + (cus_fee - paying)
 
@@ -69,7 +71,7 @@ class FeeAdminInline(admin.ModelAdmin):
 class CustomerAdmin(admin.ModelAdmin):
     # inlines = [FeeAdminInline, ]
     list_display = ['name', 'customer_id', 'phone', 'area', 'fee', ]
-    search_fields = ['name', 'customer_id', 'phone', 'area', ]
+    search_fields = ['name', 'customer_id']
     autocomplete_fields = ['fee', 'area']
     readonly_fields = ['customer_id']
 
