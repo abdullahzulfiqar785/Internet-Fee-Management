@@ -1,6 +1,7 @@
 from django.contrib import admin
+from django.http import HttpResponse
 from .models import Customer, Fee
-from .utils import get_id, get_date
+from .utils import get_id, get_date, render_to_pdf
 import datetime
 
 
@@ -41,6 +42,9 @@ class FeeAdminInline(admin.ModelAdmin):
                 obj.credit = cus_fee + left_credit + left_fee
                 paying = 0
                 obj.recipient = request.user
+                obj.save()
+                pdf = render_to_pdf("invoice/invoice.html")
+                print(type(pdf))
                 return super().save_model(request, obj, form, change)
 
         if paying > cus_fee:
